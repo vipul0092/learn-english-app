@@ -1,21 +1,16 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import Login from './components/Login';
+import { View, Text } from 'react-native';
 
 const App = () => {
-  return (
-    <View style={styles.container}>
-      <Text>Hello world!</Text>
+  const [isLoggedIn, setLoginFlag] = useState(false);
+  return !isLoggedIn ? (
+    <Login setLoginFlag={setLoginFlag} />
+  ) : (
+    <View>
+      <Text>Logged In!</Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default App;
