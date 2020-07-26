@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements';
+import { learnEnglish } from '../../assets/images';
 
 const AppInfo = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../images/learn-english.jpg')}
+        source={learnEnglish}
         style={{
           width: 300,
           height: 300,
