@@ -8,6 +8,8 @@ import {
   View,
 } from 'react-native';
 import { Button, Input, Icon, Text } from 'react-native-elements';
+import { useAuth } from '../context/AuthContext';
+import LoadingOverlay from './overlays/LoadingOverlay';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -20,11 +22,13 @@ const defaultState = {
   isLoading: false,
 };
 
-const Login = ({ setLoginFlag }) => {
+const Login = () => {
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
+  const { signIn } = useAuth();
 
   const [loginForm, setLoginFormState] = useState(defaultState);
+  const [showOverlay, setOverlayFlag] = useState(false);
   const setState = (field, value) =>
     setLoginFormState((currentState) => ({
       ...currentState,
@@ -51,7 +55,8 @@ const Login = ({ setLoginFlag }) => {
     const isUserNameValid = validateUsername();
     const isPasswordValid = validatePassword();
     if (isUserNameValid && isPasswordValid) {
-      setLoginFlag(true);
+      setOverlayFlag(true);
+      signIn(loginForm.username).then(() => setOverlayFlag(false));
     }
   };
 
@@ -109,6 +114,10 @@ const Login = ({ setLoginFlag }) => {
               />
             }
             disabled={loginForm.isLoading}
+          />
+          <LoadingOverlay
+            isVisible={showOverlay}
+            text="Please wait while we log you in..."
           />
         </View>
       </ScrollView>
