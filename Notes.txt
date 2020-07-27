@@ -22,6 +22,23 @@ sudo yum install git -y
 ps -p 53365
 kill -9 53365 
 
+## Cloning the repo
+mkdir code && cd code
+git clone https://github.com/vipul0092/learn-english-app.git
+
+## Command for fetching the latest (save into a .sh file & give it permissions)
+cd code/learn-english-app
+git clean -dfx
+git reset --hard
+git pull origin master
+sudo chmod 744 permissions.sh
+./permissions.sh
+
+## Command for build and run (save into a .sh file & give it permissions)
+cd code/learn-english-app
+./build.sh
+./run.sh
+
 ## Installing the Java service as a systemd process
 sudo chmod 744 permissions.sh
 
