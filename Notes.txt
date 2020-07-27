@@ -1,5 +1,5 @@
 ## SSH
-ssh -i ~/.ssh/ec2-instance.pem ec2-user@ec2-34-234-203-94.compute-1.amazonaws.com
+ssh -i ~/.ssh/ec2-instance.pem ec2-user@EC2-Instance-Address
 
 ## Installing Java 11
 -------------------
