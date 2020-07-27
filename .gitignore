@@ -57,3 +57,11 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+# intellij
+*.iml
+.idea/*
+!.idea/runConfigurations
+
+access.log
+target/

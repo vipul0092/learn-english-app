@@ -1,0 +1,19 @@
+server:
+  applicationConnectors:
+    - type: "http"
+      port: 9000
+  adminConnectors:
+    - type: "http"
+      port: 9001
+  requestLog:
+    appenders:
+      - type: "file"
+        currentLogFilename: "logs/access.log"
+        archivedLogFilenamePattern: "logs/access.%d{yyyy-MM-dd}.log.gz"
+  type: "default"
+
+
+logging:
+  level: INFO
+  loggers:
+    io.vgaur: DEBUG
