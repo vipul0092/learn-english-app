@@ -1,0 +1,38 @@
+## SSH
+ssh -i ~/.ssh/ec2-instance.pem ec2-user@ec2-34-234-203-94.compute-1.amazonaws.com
+
+## Installing Java 11
+-------------------
+sudo curl -o java11.rpm https://d3pxv6yz143wms.cloudfront.net/11.0.5.10.1/java-11-amazon-corretto-devel-11.0.5.10-1.x86_64.rpm
+sudo yum localinstall java11.rpm
+
+## Installing Maven
+-------------------
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+sudo yum install -y apache-maven
+mvn --version
+
+## Installing Git
+-------------------
+sudo yum install git -y
+
+## Processes
+------------
+ps -p 53365
+kill -9 53365 
+
+## Installing the Java service as a systemd process
+sudo chmod 744 permissions.sh
+
+# Setup Service
+./setup-service.sh
+
+# Build service
+./build.sh
+
+# Starting, stopping & status of the service
+sudo systemctl start vidya-backend
+sudo systemctl status vidya-backend
+sudo systemctl stop vidya-backend
+  

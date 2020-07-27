@@ -1,0 +1,1 @@
+java -Dexternal.sys.properties=file:system.properties -Dexternal.app.properties=file:application.properties -jar target/learn-backend-0.0.1-SNAPSHOT.jar server src/configs/config.yml
