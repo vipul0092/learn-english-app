@@ -25,11 +25,14 @@ kill -9 53365
 ## Installing the Java service as a systemd process
 sudo chmod 744 permissions.sh
 
-# Setup Service
-./setup-service.sh
-
 # Build service
 ./build.sh
+
+# Running service normally
+./run.sh
+
+# Setup Service via systemctl
+./setup-service-systemctl.sh
 
 # Starting, stopping & status of the service
 sudo systemctl start vidya-backend

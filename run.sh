@@ -1,0 +1,1 @@
+nohup java -jar learn-backend/target/learn-backend-0.0.1-SNAPSHOT.jar server learn-backend/src/configs/config.yml &
