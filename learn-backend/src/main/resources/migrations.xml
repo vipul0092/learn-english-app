@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+                                       http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="createteacherstable" author="vgaur">
+        <sqlFile path="migrations/001_create_teachers_table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="createstudentstable" author="vgaur">
+        <sqlFile path="migrations/002_create_students_table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="createtokensapikeystable" author="vgaur">
+        <sqlFile path="migrations/003_create_tokens_apikeys_table.sql" splitStatements="false"/>
+    </changeSet>
+</databaseChangeLog>

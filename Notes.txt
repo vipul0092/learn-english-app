@@ -17,6 +17,14 @@ mvn --version
 -------------------
 sudo yum install git -y
 
+## For Postgres
+---------------
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; #Allows you to generate uuids on db side
+
+## For compilation with Java 11
+-------------------------------
+Make "toolchains.xml" in ~/.m2 folder with contents similar to .xml file in the learn-backend folder
+
 ## Processes
 ------------
 ps -p 53365
