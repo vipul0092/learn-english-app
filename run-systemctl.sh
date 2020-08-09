@@ -1,1 +1,1 @@
-java -Dexternal.sys.properties=file:system.properties -Dexternal.app.properties=file:application.properties -jar learn-backend/target/learn-backend-0.0.1-SNAPSHOT.jar server learn-backend/src/configs/config.yml
+java -Duser.timezone="UTC" -Dexternal.sys.properties=file:system.properties -Dexternal.app.properties=file:application.properties -jar learn-backend/target/learn-backend-0.0.1-SNAPSHOT.jar server learn-backend/src/configs/config.yml

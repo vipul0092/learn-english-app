@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.vgaur.vidya.dao.mappers.AuthMapper">
+
+    <insert id="saveToken">
+        INSERT INTO
+        TOKENS
+        ( id, metadata, created_date, last_modified_date )
+        VALUES
+        (
+            #{id},
+            to_json(#{metadata}::json),
+            current_timestamp,
+            current_timestamp
+        )
+    </insert>
+
+    <select id="getToken" resultType="String">
+        SELECT metadata
+        FROM TOKENS
+        WHERE id = #{id}
+    </select>
+
+    <resultMap id="apiKeyMap" autoMapping="true"
+               type="io.vgaur.vidya.models.auth.ImmutableApiKeyData">
+        <constructor>
+            <arg column="apiKey" javaType="java.util.UUID"/>
+            <arg column="roles" javaType="String"/>
+        </constructor>
+    </resultMap>
+
+
+    <select id="getApiKey" resultMap="apiKeyMap">
+        SELECT
+            id as apiKey,
+            roles
+        FROM APIKEYS
+        WHERE id = #{id}
+    </select>
+
+    <delete id="deleteToken">
+        DELETE
+        FROM TOKENS
+        WHERE id = #{id}
+    </delete>
+</mapper>

@@ -1,1 +1,1 @@
-nohup java -jar learn-backend/target/learn-backend-0.0.1-SNAPSHOT.jar server learn-backend/src/configs/config.yml &
+nohup java -Duser.timezone="UTC" -jar learn-backend/target/learn-backend-0.0.1-SNAPSHOT.jar server learn-backend/src/configs/config.yml &

@@ -12,6 +12,29 @@ server:
         archivedLogFilenamePattern: "logs/access.%d{yyyy-MM-dd}.log.gz"
   type: "default"
 
+database:
+  driverClass: org.postgresql.Driver
+  maxWaitForConnection: 1s
+  validationQuery: "/* Health Check */ SELECT 1"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: true
+  checkConnectionOnBorrow: true
+  validationInterval: 30s
+  evictionInterval: 5s
+  minIdleTime: 1 minute
+  user: USER
+  password: PASSWORD
+  url: "URL"
+  properties:
+    charSet: UTF-8
+    applicationName: vidya-backend
+
+s3:
+  accessKeyId: S3_KEY
+  secretAccessKey: S3_SECRET
+  dataBucket: vidyadata
+  awsRegion: us-east-1
 
 logging:
   level: INFO

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.vgaur.vidya.dao.mappers.TeachersMapper">
+
+    <insert id="addTeacher">
+        INSERT INTO
+        TEACHERS
+        ( id, name, email, pass, active, created_date, last_modified_date )
+        VALUES
+        (
+            #{teacher.id},
+            #{teacher.name},
+            #{teacher.email},
+            #{teacher.pass},
+            #{teacher.active},
+            current_timestamp,
+            current_timestamp
+        )
+    </insert>
+
+    <resultMap id="teacherMap" autoMapping="true"
+               type="io.vgaur.vidya.models.ImmutableTeacher">
+        <constructor>
+            <arg column="id" javaType="java.util.UUID"/>
+            <arg column="name" javaType="String"/>
+            <arg column="email" javaType="String"/>
+            <arg column="pass" javaType="String"/>
+            <arg column="active" javaType="_boolean"/>
+        </constructor>
+    </resultMap>
+
+    <select id="getTeacher" resultMap="teacherMap">
+        SELECT
+            id,
+            name,
+            email,
+            pass,
+            active
+        FROM TEACHERS
+        WHERE id = #{teacherId}
+    </select>
+</mapper>
