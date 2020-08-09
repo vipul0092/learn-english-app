@@ -8,11 +8,12 @@ import {
   View,
 } from 'react-native';
 import { Button, Input, Icon, Text } from 'react-native-elements';
-import { useAuth } from '../context/AuthContext';
+import { useUserContext } from '../context/UserContext';
 import LoadingOverlay from './overlays/LoadingOverlay';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+const MIN_PASSWORD_LENGTH = 6;
 
 const defaultState = {
   username: '',
@@ -25,7 +26,7 @@ const defaultState = {
 const Login = () => {
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
-  const { signIn } = useAuth();
+  const { signIn } = useUserContext();
 
   const [loginForm, setLoginFormState] = useState(defaultState);
   const [showOverlay, setOverlayFlag] = useState(false);
@@ -45,7 +46,7 @@ const Login = () => {
 
   const validatePassword = () => {
     const { password } = loginForm;
-    const passwordValid = password.length >= 8;
+    const passwordValid = password.length >= MIN_PASSWORD_LENGTH;
     setState('passwordValid', passwordValid);
     passwordValid || passwordInput.current.shake();
     return passwordValid;
@@ -56,7 +57,9 @@ const Login = () => {
     const isPasswordValid = validatePassword();
     if (isUserNameValid && isPasswordValid) {
       setOverlayFlag(true);
-      signIn(loginForm.username).then(() => setOverlayFlag(false));
+      signIn(loginForm.username, loginForm.password).then(() =>
+        setOverlayFlag(false),
+      );
     }
   };
 
