@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A factor for creating instances of MyBatis
- *
- * @author bryan
+ * A factory for creating instances of MyBatis
  */
 public class MyBatisFactory {
     /**

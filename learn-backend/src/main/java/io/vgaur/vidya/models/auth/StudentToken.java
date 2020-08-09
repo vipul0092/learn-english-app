@@ -1,4 +1,4 @@
-package io.vgaur.vidya.models;
+package io.vgaur.vidya.models.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -8,6 +8,7 @@ import org.immutables.value.Value;
 import java.util.UUID;
 
 /**
+ * Token object created for a token request
  * Created by vgaur created on 03/08/20
  */
 @Value.Immutable

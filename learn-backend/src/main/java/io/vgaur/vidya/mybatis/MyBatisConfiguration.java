@@ -6,7 +6,7 @@ import io.dropwizard.db.DataSourceFactory;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Created by jmorley on 9/22/14.
+ * Mybatis config
  */
 public class MyBatisConfiguration {
 

@@ -1,20 +1,31 @@
 package io.vgaur.vidya;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthFilter;
+import io.dropwizard.auth.PolymorphicAuthDynamicFeature;
+import io.dropwizard.auth.PolymorphicAuthValueFactoryProvider;
+import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.vgaur.vidya.auth.ApiKeyAuthenticator;
+import io.vgaur.vidya.auth.BearerAuthenticator;
+import io.vgaur.vidya.auth.RoleAuthorizer;
 import io.vgaur.vidya.config.VidyaServiceConfiguration;
 import io.vgaur.vidya.dao.StudentDao;
 import io.vgaur.vidya.dao.TeacherDao;
-import io.vgaur.vidya.dao.TokenDao;
+import io.vgaur.vidya.dao.AuthDao;
 import io.vgaur.vidya.dao.mappers.StudentsMapper;
 import io.vgaur.vidya.dao.mappers.TeachersMapper;
-import io.vgaur.vidya.dao.mappers.TokensMapper;
+import io.vgaur.vidya.dao.mappers.AuthMapper;
 import io.vgaur.vidya.exceptions.UncheckedExecutionExceptionMapper;
+import io.vgaur.vidya.models.auth.ApiKeyContext;
+import io.vgaur.vidya.models.auth.UserContext;
 import io.vgaur.vidya.models.serialization.VidyaInternalModule;
 import io.vgaur.vidya.mybatis.DefaultSqlSessionFactoryProvider;
 import io.vgaur.vidya.mybatis.UUIDObjectTypeHandler;
@@ -64,12 +75,12 @@ public class VidyaServiceApplication extends Application<VidyaServiceConfigurati
                 .register(UUID.class, UUIDObjectTypeHandler.class)
                 .addMapper(TeachersMapper.class)
                 .addMapper(StudentsMapper.class)
-                .addMapper(TokensMapper.class)
+                .addMapper(AuthMapper.class)
                 .build();
 
         var teachersDao = new TeacherDao(sqlSessionFactoryProvider);
         var studentsDao = new StudentDao(sqlSessionFactoryProvider);
-        var tokensDao = new TokenDao(environment.getObjectMapper(), sqlSessionFactoryProvider);
+        var tokensDao = new AuthDao(environment.getObjectMapper(), sqlSessionFactoryProvider);
 
         var teacherService = new TeacherService(teachersDao);
         var studentService = new StudentService(studentsDao);
@@ -78,6 +89,32 @@ public class VidyaServiceApplication extends Application<VidyaServiceConfigurati
         environment.jersey().register(new AuthResource(authService));
         environment.jersey().register(new TeachersResource(teacherService, studentService));
         environment.jersey().register(new StudentResource(studentService));
+
+        registerAuth(environment, authService);
+    }
+
+    private static void registerAuth(Environment environment, AuthService authService) {
+        final AuthFilter<String, UserContext> bearerAuthFilter
+                = new OAuthCredentialAuthFilter.Builder<UserContext>()
+                .setAuthenticator(new BearerAuthenticator(authService))
+                .setPrefix("bearer")
+                .buildAuthFilter();
+        final AuthFilter<String, ApiKeyContext> apiKeyAuthFilter
+                = new OAuthCredentialAuthFilter.Builder<ApiKeyContext>()
+                .setAuthenticator(new ApiKeyAuthenticator(authService))
+                .setAuthorizer(new RoleAuthorizer<>())
+                .setPrefix("api_key")
+                .buildAuthFilter();
+
+        final var dynamicFeature = new PolymorphicAuthDynamicFeature<>(
+                ImmutableMap.of(
+                        UserContext.class, bearerAuthFilter,
+                        ApiKeyContext.class, apiKeyAuthFilter));
+        final var binder = new PolymorphicAuthValueFactoryProvider.Binder<>(
+                ImmutableSet.of(UserContext.class, ApiKeyContext.class));
+
+        environment.jersey().register(dynamicFeature);
+        environment.jersey().register(binder);
     }
 
 }

@@ -3,12 +3,13 @@ package io.vgaur.vidya.services;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.vgaur.vidya.dao.TokenDao;
-import io.vgaur.vidya.models.ImmutableStudentToken;
+import io.vgaur.vidya.dao.AuthDao;
+import io.vgaur.vidya.models.auth.ApiKeyData;
+import io.vgaur.vidya.models.auth.ImmutableStudentToken;
 import io.vgaur.vidya.models.Student;
-import io.vgaur.vidya.models.StudentToken;
+import io.vgaur.vidya.models.auth.StudentToken;
 import io.vgaur.vidya.models.Teacher;
-import io.vgaur.vidya.models.TokenRequest;
+import io.vgaur.vidya.models.auth.TokenRequest;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.WebApplicationException;
@@ -17,13 +18,14 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Service class dealing with tokens and api keys
  * Created by vgaur created on 02/08/20
  */
 public class AuthService {
 
     private final StudentService studentService;
     private final TeacherService teacherService;
-    private final TokenDao tokenDao;
+    private final AuthDao authDao;
 
     private final LoadingCache<UUID, StudentToken> tokensCache = CacheBuilder.newBuilder()
             .build(new CacheLoader<>() {
@@ -33,17 +35,28 @@ public class AuthService {
                 }
             });
 
-    public AuthService(TokenDao tokenDao, StudentService studentService, TeacherService teacherService) {
-        this.tokenDao = tokenDao;
+    private final LoadingCache<UUID, ApiKeyData> apiKeyCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<>() {
+                @Override
+                public ApiKeyData load(UUID apiKey) {
+                    return getApiKeyInternal(apiKey);
+                }
+            });
+
+    public AuthService(AuthDao authDao, StudentService studentService, TeacherService teacherService) {
+        this.authDao = authDao;
         this.studentService = studentService;
         this.teacherService = teacherService;
     }
 
+    /**
+     * Generate token for the given request after verifying the information
+     */
     public StudentToken generateToken(TokenRequest tokenRequest) throws ExecutionException {
         Student student = studentService.getStudentByEmail(tokenRequest.email());
 
         if (!student.pass().equals(tokenRequest.pass())
-            || !verifyStudentDetails(student)) {
+                || !verifyStudentDetails(student)) {
             throw new WebApplicationException("Invalid Student Data", HttpStatus.UNAUTHORIZED_401);
         }
 
@@ -55,22 +68,39 @@ public class AuthService {
                 .teacherId(student.teacherId())
                 .build();
 
-        tokenDao.saveToken(studentToken);
+        authDao.saveToken(studentToken);
         tokensCache.put(tokenId, studentToken);
         return studentToken;
     }
 
+    /**
+     * Verify if the token is still valid
+     */
     public StudentToken verifyToken(UUID tokenId) throws ExecutionException {
         var token = tokensCache.get(tokenId);
         Student student = studentService.getStudent(token.id());
         if (!verifyStudentDetails(student)) {
             // Remove the token
-            tokenDao.deleteToken(tokenId);
-            tokensCache.invalidate(tokenId);
-
+            deleteToken(tokenId);
             throw new WebApplicationException("Invalid Student Data", HttpStatus.UNAUTHORIZED_401);
         }
         return token;
+    }
+
+    /**
+     * Delete the token with the given id
+     */
+    public void deleteToken(UUID tokenId) throws ExecutionException {
+        tokensCache.get(tokenId); // This will check that the token actually exists
+        authDao.deleteToken(tokenId);
+        tokensCache.invalidate(tokenId);
+    }
+
+    /**
+     * Get api key details for the given api key
+     */
+    public ApiKeyData getApiKeyData(UUID apiKey) throws ExecutionException {
+        return apiKeyCache.get(apiKey);
     }
 
     private boolean verifyStudentDetails(Student student) throws ExecutionException {
@@ -83,10 +113,12 @@ public class AuthService {
     }
 
     private StudentToken getTokenInternal(UUID tokenId) {
-        var token = tokenDao.getToken(tokenId);
-        if (token == null) {
-            throw new WebApplicationException("Token not found", HttpStatus.NOT_FOUND_404);
-        }
-        return token;
+        var token = authDao.getToken(tokenId);
+        return token.orElseThrow(() -> new WebApplicationException("Token not found", HttpStatus.NOT_FOUND_404));
+    }
+
+    private ApiKeyData getApiKeyInternal(UUID apiKey) {
+        var apiKeyData = authDao.getApiKey(apiKey);
+        return apiKeyData.orElseThrow(() -> new WebApplicationException("Api key not found", HttpStatus.NOT_FOUND_404));
     }
 }

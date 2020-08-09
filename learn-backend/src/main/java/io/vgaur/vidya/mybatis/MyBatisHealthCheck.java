@@ -8,8 +8,6 @@ import java.sql.CallableStatement;
 
 /**
  * A standard MyBatis healthcheck
- *
- * @author bryan
  */
 public class MyBatisHealthCheck extends HealthCheck {
     /**

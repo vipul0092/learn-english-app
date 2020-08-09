@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Service class dealing with Teachers
  * Created by vgaur created on 01/08/20
  */
 public class TeacherService {
@@ -29,21 +30,24 @@ public class TeacherService {
         this.teacherDao = teacherDao;
     }
 
+    /**
+     * Create a teacher record in db for the given teacher information
+     */
     public Teacher createTeacher(Teacher teacher) {
         teacherDao.addTeacher(teacher);
         teacherCache.put(teacher.id(), teacher);
         return teacher;
     }
 
+    /**
+     * Get teacher for the given id
+     */
     public Teacher getTeacher(UUID teacherId) throws ExecutionException {
         return teacherCache.get(teacherId);
     }
 
     private Teacher getTeacherInternal(UUID teacherId) {
         var teacher = teacherDao.getTeacher(teacherId);
-        if (teacher == null) {
-            throw new WebApplicationException("Teacher not found", HttpStatus.NOT_FOUND_404);
-        }
-        return teacher;
+        return teacher.orElseThrow(() -> new WebApplicationException("Teacher not found", HttpStatus.NOT_FOUND_404));
     }
 }

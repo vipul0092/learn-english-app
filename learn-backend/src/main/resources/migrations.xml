@@ -13,4 +13,7 @@
     <changeSet id="createtokensapikeystable" author="vgaur">
         <sqlFile path="migrations/003_create_tokens_apikeys_table.sql" splitStatements="false"/>
     </changeSet>
+    <changeSet id="createtokensapikeystablewithchangetimestamps" author="vgaur">
+        <sqlFile path="migrations/004_create_tokens_apikeys_table_with_changetimestamps.sql" splitStatements="false"/>
+    </changeSet>
 </databaseChangeLog>

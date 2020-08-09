@@ -1,13 +1,15 @@
-package io.vgaur.vidya.models;
+package io.vgaur.vidya.models.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.vgaur.vidya.models.UserType;
 import org.immutables.value.Value;
 
 import javax.validation.constraints.NotNull;
 
 /**
+ * Request object for creating a token
  * Created by vgaur created on 03/08/20
  */
 @Value.Immutable

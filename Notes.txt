@@ -43,9 +43,17 @@ sudo chmod 744 permissions.sh
 ./permissions.sh
 
 ## Command for build and run (save into a .sh file & give it permissions)
+replace-secrets.sh
 cd code/learn-english-app
 ./build.sh
 ./run.sh
+
+## replace-secrets.sh - Shell commands for replacing config values with secrets
+sed -i -e 's/DB_USER/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
+sed -i -e 's/DB_PASSWORD/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
+sed -i -e 's/DB_URL/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
+sed -i -e 's/S3_KEY/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
+sed -i -e 's/S3_SECRET/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
 
 ## Installing the Java service as a systemd process
 sudo chmod 744 permissions.sh

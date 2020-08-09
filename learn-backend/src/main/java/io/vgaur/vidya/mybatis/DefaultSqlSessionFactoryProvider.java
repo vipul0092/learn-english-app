@@ -19,7 +19,6 @@ import static io.vgaur.vidya.Constants.ENVIRONMENT;
  * in the configuration on startup. It also manages new session creation during runtime for new environments not
  * available in the existing session factories collection.
  *
- * @author Brent Ryan, Nikhil Bhagwat, zhuang
  */
 public final class DefaultSqlSessionFactoryProvider {
 

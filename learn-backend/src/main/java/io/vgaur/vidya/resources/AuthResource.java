@@ -1,12 +1,16 @@
 package io.vgaur.vidya.resources;
 
-import io.vgaur.vidya.models.StudentToken;
-import io.vgaur.vidya.models.TokenRequest;
+import io.dropwizard.auth.Auth;
+import io.vgaur.vidya.models.auth.StudentToken;
+import io.vgaur.vidya.models.auth.TokenRequest;
+import io.vgaur.vidya.models.auth.ApiKeyContext;
 import io.vgaur.vidya.services.AuthService;
 import org.eclipse.jetty.http.HttpStatus;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Auth related endpoints
  * Created by vgaur created on 27/07/20
  */
 @Produces("application/json")
@@ -30,20 +35,35 @@ public class AuthResource {
         this.authService = authService;
     }
 
+    @RolesAllowed("TOKEN_CONSUMER")
     @POST
     @Path("/token")
     public Response getAuthToken(
-            @Valid TokenRequest tokenRequest
+            @Valid TokenRequest tokenRequest,
+            @Auth ApiKeyContext apiKeyContext
     ) throws ExecutionException {
         var token = authService.generateToken(tokenRequest);
         return Response.status(HttpStatus.CREATED_201).entity(token).build();
     }
 
+    @RolesAllowed("TOKEN_CONSUMER")
     @GET
     @Path("/token/{id}/verify")
     public StudentToken verifyToken(
-            @PathParam("id") UUID tokenId
+            @PathParam("id") UUID tokenId,
+            @Auth ApiKeyContext apiKeyContext
     ) throws ExecutionException {
         return authService.verifyToken(tokenId);
+    }
+
+    @RolesAllowed("ADMIN")
+    @DELETE
+    @Path("/token/{id}")
+    public Response deleteToken(
+            @PathParam("id") UUID tokenId,
+            @Auth ApiKeyContext apiKeyContext
+    ) throws ExecutionException {
+        authService.deleteToken(tokenId);
+        return Response.status(HttpStatus.NO_CONTENT_204).build();
     }
 }

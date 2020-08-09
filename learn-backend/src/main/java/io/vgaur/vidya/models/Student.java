@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
+ * Student data model
  * Created by vgaur created on 03/08/20
  */
 @Value.Immutable

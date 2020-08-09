@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Service class dealing with Students data
  * Created by vgaur created on 01/08/20
  */
 public class StudentService {
@@ -39,6 +40,9 @@ public class StudentService {
         this.studentDao = studentDao;
     }
 
+    /**
+     * Create student record in db for the given student request for the given teacher id
+     */
     public Student createStudent(StudentRequest studentRequest, UUID teacherId) {
         Student incomingStudent = studentRequest.student();
         int days = studentRequest.period().getDays();
@@ -52,29 +56,29 @@ public class StudentService {
         return incomingStudent;
     }
 
+    /**
+     * Get student for the given student id
+     */
     public Student getStudent(UUID studentId) throws ExecutionException {
         return studentByIdCache.get(studentId);
     }
 
-
+    /**
+     * Get student with the given email address
+     */
     public Student getStudentByEmail(String email) throws ExecutionException {
         return studentByEmailCache.get(email);
     }
 
     private Student getStudentInternal(UUID studentId) {
         var student = studentDao.getStudent(studentId);
-        if (student == null) {
-            throw new WebApplicationException("Student not found", HttpStatus.NOT_FOUND_404);
-        }
-        return student;
+        return student.orElseThrow(() -> new WebApplicationException("Student not found", HttpStatus.NOT_FOUND_404));
     }
 
     private Student getStudentByEmailInternal(String email) {
         var student = studentDao.getStudentByEmail(email.toLowerCase());
-        if (student == null) {
-            throw new WebApplicationException("Student email record incorrect", HttpStatus.NOT_FOUND_404);
-        }
-        return student;
+        return student.orElseThrow(() ->
+                new WebApplicationException("Student email record incorrect", HttpStatus.NOT_FOUND_404));
     }
 
     private void addStudentToCaches(Student student) {

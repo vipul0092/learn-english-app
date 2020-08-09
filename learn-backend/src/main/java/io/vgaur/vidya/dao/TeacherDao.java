@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -39,11 +40,11 @@ public class TeacherDao {
     /**
      * Get teacher
      */
-    public Teacher getTeacher(UUID id) {
+    public Optional<Teacher> getTeacher(UUID id) {
         SqlSessionFactory sessionFactory = sessionFactoryProvider.getSqlSessionFactory();
         try (SqlSession session = sessionFactory.openSession(true)) {
             var mapper = session.getMapper(TeachersMapper.class);
-            return mapper.getTeacher(id);
+            return Optional.ofNullable(mapper.getTeacher(id));
         } catch (Exception e) {
             LOG.error("Failed to get teacher with id: {}", id, e);
             throw new WebApplicationException("Failed to get teacher");

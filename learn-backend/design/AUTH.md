@@ -1,3 +1,9 @@
+## High Level Design
+* The service exposes an OAuth like token system for access to different endpoints.
+* Consuming applications will have an API Key given to them and using that they can create a token and then use that token for other endpoints.
+* The service uses [Dropwizard's auth system](https://www.dropwizard.io/en/latest/manual/auth.html) for doing this.
+
+
 ## Fresh Login Process - Students
 1. Login request from the app sends the email & password
 2. Fetches the student record for the email, checks the password hash

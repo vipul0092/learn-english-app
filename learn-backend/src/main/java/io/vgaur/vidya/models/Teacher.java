@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 /**
+ * Teacher data model
  * Created by vgaur created on 03/08/20
  */
 @Value.Immutable

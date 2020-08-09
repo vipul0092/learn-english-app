@@ -31,8 +31,8 @@ database:
     applicationName: vidya-backend
 
 s3:
-  accessKeyId: ACC
-  secretAccessKey: SECRET
+  accessKeyId: S3_KEY
+  secretAccessKey: S3_SECRET
   dataBucket: vidyadata
   awsRegion: us-east-1
 

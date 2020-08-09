@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -39,11 +40,11 @@ public class StudentDao {
     /**
      * Get student
      */
-    public Student getStudent(UUID id) {
+    public Optional<Student> getStudent(UUID id) {
         SqlSessionFactory sessionFactory = sessionFactoryProvider.getSqlSessionFactory();
         try (SqlSession session = sessionFactory.openSession(true)) {
             var mapper = session.getMapper(StudentsMapper.class);
-            return mapper.getStudent(id);
+            return Optional.ofNullable(mapper.getStudent(id));
         } catch (Exception e) {
             LOG.error("Failed to get student with id: {}", id, e);
             throw new WebApplicationException("Failed to get student");
@@ -53,13 +54,13 @@ public class StudentDao {
     /**
      * Get student by email
      */
-    public Student getStudentByEmail(String email) {
+    public Optional<Student> getStudentByEmail(String email) {
         SqlSessionFactory sessionFactory = sessionFactoryProvider.getSqlSessionFactory();
         try (SqlSession session = sessionFactory.openSession(true)) {
             var mapper = session.getMapper(StudentsMapper.class);
-            return mapper.getStudentByEmail(email);
+            return Optional.ofNullable(mapper.getStudentByEmail(email));
         } catch (Exception e) {
-            LOG.error("Failed to get student with id: {}", email, e);
+            LOG.error("Failed to get student with email: {}", email, e);
             throw new WebApplicationException("Failed to get student by email");
         }
     }
