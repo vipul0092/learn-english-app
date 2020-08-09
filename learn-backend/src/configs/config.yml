@@ -23,9 +23,9 @@ database:
   validationInterval: 30s
   evictionInterval: 5s
   minIdleTime: 1 minute
-  user: USER
-  password: PASSWORD
-  url: "URL"
+  user: DB_USER
+  password: DB_PASSWORD
+  url: "DB_URL"
   properties:
     charSet: UTF-8
     applicationName: vidya-backend
