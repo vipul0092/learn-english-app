@@ -42,7 +42,7 @@ public class AuthResource {
             @Valid TokenRequest tokenRequest,
             @Auth ApiKeyContext apiKeyContext
     ) throws ExecutionException {
-        var token = authService.generateToken(tokenRequest);
+        var token = authService.generateToken(tokenRequest, apiKeyContext);
         return Response.status(HttpStatus.CREATED_201).entity(token).build();
     }
 
@@ -63,7 +63,7 @@ public class AuthResource {
             @PathParam("id") UUID tokenId,
             @Auth ApiKeyContext apiKeyContext
     ) throws ExecutionException {
-        authService.deleteToken(tokenId);
+        authService.deleteToken(apiKeyContext, tokenId);
         return Response.status(HttpStatus.NO_CONTENT_204).build();
     }
 }

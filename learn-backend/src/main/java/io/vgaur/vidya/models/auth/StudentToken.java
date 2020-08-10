@@ -24,4 +24,6 @@ public interface StudentToken {
     UUID teacherId();
 
     UUID tokenId();
+
+    UUID createdWithApiKey();
 }

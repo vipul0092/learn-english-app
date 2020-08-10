@@ -40,6 +40,13 @@ public class StudentService {
         this.studentDao = studentDao;
     }
 
+    public Runnable getStudentCachesInvalidator() {
+        return () -> {
+            studentByEmailCache.invalidateAll();
+            studentByIdCache.invalidateAll();
+        };
+    }
+
     /**
      * Create student record in db for the given student request for the given teacher id
      */

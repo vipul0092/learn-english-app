@@ -1,6 +1,7 @@
 package io.vgaur.vidya;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.dropwizard.Application;
@@ -30,6 +31,7 @@ import io.vgaur.vidya.models.serialization.VidyaInternalModule;
 import io.vgaur.vidya.mybatis.DefaultSqlSessionFactoryProvider;
 import io.vgaur.vidya.mybatis.UUIDObjectTypeHandler;
 import io.vgaur.vidya.resources.AuthResource;
+import io.vgaur.vidya.resources.CacheResource;
 import io.vgaur.vidya.resources.StudentResource;
 import io.vgaur.vidya.resources.TeachersResource;
 import io.vgaur.vidya.services.AuthService;
@@ -89,8 +91,20 @@ public class VidyaServiceApplication extends Application<VidyaServiceConfigurati
         environment.jersey().register(new AuthResource(authService));
         environment.jersey().register(new TeachersResource(teacherService, studentService));
         environment.jersey().register(new StudentResource(studentService));
+        environment.jersey().register(setupCacheResource(authService, studentService, teacherService));
 
         registerAuth(environment, authService);
+    }
+
+    private static CacheResource setupCacheResource(AuthService authService, StudentService studentService,
+                                                    TeacherService teacherService) {
+        var cacheMap = ImmutableMap.<CacheResource.CacheType, Runnable>builder();
+        cacheMap.put(CacheResource.CacheType.APIKEYS, authService.getApiKeysCacheInvalidator());
+        cacheMap.put(CacheResource.CacheType.TOKENS, authService.getTokensCacheInvalidator());
+        cacheMap.put(CacheResource.CacheType.STUDENTS, studentService.getStudentCachesInvalidator());
+        cacheMap.put(CacheResource.CacheType.TEACHERS, teacherService.getTeachersCacheInvalidator());
+
+        return new CacheResource(cacheMap.build());
     }
 
     private static void registerAuth(Environment environment, AuthService authService) {

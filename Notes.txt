@@ -34,13 +34,22 @@ kill -9 53365
 mkdir code && cd code
 git clone https://github.com/vipul0092/learn-english-app.git
 
-## Command for fetching the latest (save into a .sh file & give it permissions)
+## Command for fetching the latest from a branch (save into a .sh file & give it permissions)
+--------------------------------------------------------------------------
+branch="$1"
+if [[ -z "$branch" ]]; then
+  branch="master"
+fi
+echo "Fetching latest from $branch branch..."
+echo ""
+
 cd code/learn-english-app
 git clean -dfx
 git reset --hard
-git pull origin master
+git fetch origin $branch && git checkout $branch && git pull origin $branch
 sudo chmod 744 permissions.sh
 ./permissions.sh
+--------------------------------------------------------------------------
 
 ## Command for build and run (save into a .sh file & give it permissions)
 replace-secrets.sh

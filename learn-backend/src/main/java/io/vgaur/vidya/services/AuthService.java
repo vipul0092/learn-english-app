@@ -4,11 +4,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.vgaur.vidya.dao.AuthDao;
+import io.vgaur.vidya.models.Student;
+import io.vgaur.vidya.models.Teacher;
+import io.vgaur.vidya.models.auth.ApiKeyContext;
 import io.vgaur.vidya.models.auth.ApiKeyData;
 import io.vgaur.vidya.models.auth.ImmutableStudentToken;
-import io.vgaur.vidya.models.Student;
 import io.vgaur.vidya.models.auth.StudentToken;
-import io.vgaur.vidya.models.Teacher;
 import io.vgaur.vidya.models.auth.TokenRequest;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -49,10 +50,19 @@ public class AuthService {
         this.teacherService = teacherService;
     }
 
+    public Runnable getTokensCacheInvalidator() {
+        return tokensCache::invalidateAll;
+    }
+
+    public Runnable getApiKeysCacheInvalidator() {
+        return apiKeyCache::invalidateAll;
+    }
+
     /**
      * Generate token for the given request after verifying the information
      */
-    public StudentToken generateToken(TokenRequest tokenRequest) throws ExecutionException {
+    public StudentToken generateToken(TokenRequest tokenRequest, ApiKeyContext apiKeyContext)
+            throws ExecutionException {
         Student student = studentService.getStudentByEmail(tokenRequest.email());
 
         if (!student.pass().equals(tokenRequest.pass())
@@ -63,6 +73,7 @@ public class AuthService {
         UUID tokenId = UUID.randomUUID();
         var studentToken = ImmutableStudentToken.builder()
                 .tokenId(tokenId)
+                .createdWithApiKey(apiKeyContext.apiKey())
                 .email(student.email())
                 .id(student.id())
                 .teacherId(student.teacherId())
@@ -81,7 +92,7 @@ public class AuthService {
         Student student = studentService.getStudent(token.id());
         if (!verifyStudentDetails(student)) {
             // Remove the token
-            deleteToken(tokenId);
+            deleteTokenInternal(tokenId);
             throw new WebApplicationException("Invalid Student Data", HttpStatus.UNAUTHORIZED_401);
         }
         return token;
@@ -90,10 +101,15 @@ public class AuthService {
     /**
      * Delete the token with the given id
      */
-    public void deleteToken(UUID tokenId) throws ExecutionException {
-        tokensCache.get(tokenId); // This will check that the token actually exists
-        authDao.deleteToken(tokenId);
-        tokensCache.invalidate(tokenId);
+    public void deleteToken(ApiKeyContext apiKeyContext, UUID tokenId) throws ExecutionException {
+        StudentToken token = tokensCache.get(tokenId); // This will check that the token actually exists
+        // To delete a token, either the api key should have the admin role
+        // or the token should have been created with the same api key
+        if (apiKeyContext.isAdmin() || token.createdWithApiKey().equals(apiKeyContext.apiKey())) {
+            deleteTokenInternal(tokenId);
+        } else {
+            throw new WebApplicationException("Cant delete token", HttpStatus.UNAUTHORIZED_401);
+        }
     }
 
     /**
@@ -110,6 +126,11 @@ public class AuthService {
         }
         Teacher teacher = teacherService.getTeacher(student.teacherId());
         return teacher.active();
+    }
+
+    private void deleteTokenInternal(UUID tokenId) {
+        authDao.deleteToken(tokenId);
+        tokensCache.invalidate(tokenId);
     }
 
     private StudentToken getTokenInternal(UUID tokenId) {

@@ -30,6 +30,10 @@ public class TeacherService {
         this.teacherDao = teacherDao;
     }
 
+    public Runnable getTeachersCacheInvalidator() {
+        return teacherCache::invalidateAll;
+    }
+
     /**
      * Create a teacher record in db for the given teacher information
      */

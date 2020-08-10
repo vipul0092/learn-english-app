@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { useAuth } from '../../../context/AuthContext';
+import { useUserContext } from '../../../context/UserContext';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
 
 const Intermediate = () => {
-  const { userName, signOut } = useAuth();
+  const { userName, signOut } = useUserContext();
   const [showOverlay, setOverlayFlag] = useState(false);
   const logOut = () => {
     setOverlayFlag(true);

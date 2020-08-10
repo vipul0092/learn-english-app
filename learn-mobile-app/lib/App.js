@@ -6,7 +6,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from './components/Login';
 import SplashScreen from './components/SplashScreen';
 import HomeScreen from './components/home/ParentHome';
-import AuthContext, { useSetupUserData } from './context/AuthContext';
+import UserContext, { useSetupUserData } from './context/UserContext';
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Require cycle:']);
 
 const Stack = createStackNavigator();
 
@@ -24,7 +26,7 @@ const App = () => {
   }, [fetchInitialData]);
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <UserContext.Provider value={contextValue}>
       <Stack.Navigator headerMode="none">
         {loading ? (
           // We haven't finished checking for the token yet
@@ -44,7 +46,7 @@ const App = () => {
           <Stack.Screen name="Home" component={HomeScreen} />
         )}
       </Stack.Navigator>
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };
 

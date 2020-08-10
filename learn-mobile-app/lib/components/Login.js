@@ -8,11 +8,13 @@ import {
   View,
 } from 'react-native';
 import { Button, Input, Icon, Text } from 'react-native-elements';
-import { useAuth } from '../context/AuthContext';
+import { useUserContext } from '../context/UserContext';
 import LoadingOverlay from './overlays/LoadingOverlay';
+import { Snackbar } from 'react-native-paper';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+const MIN_PASSWORD_LENGTH = 6;
 
 const defaultState = {
   username: '',
@@ -25,10 +27,12 @@ const defaultState = {
 const Login = () => {
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
-  const { signIn } = useAuth();
+  const { signIn } = useUserContext();
 
   const [loginForm, setLoginFormState] = useState(defaultState);
   const [showOverlay, setOverlayFlag] = useState(false);
+  const [loginFailed, setLoginFailed] = useState(false);
+
   const setState = (field, value) =>
     setLoginFormState((currentState) => ({
       ...currentState,
@@ -45,7 +49,7 @@ const Login = () => {
 
   const validatePassword = () => {
     const { password } = loginForm;
-    const passwordValid = password.length >= 8;
+    const passwordValid = password.length >= MIN_PASSWORD_LENGTH;
     setState('passwordValid', passwordValid);
     passwordValid || passwordInput.current.shake();
     return passwordValid;
@@ -56,8 +60,23 @@ const Login = () => {
     const isPasswordValid = validatePassword();
     if (isUserNameValid && isPasswordValid) {
       setOverlayFlag(true);
-      signIn(loginForm.username).then(() => setOverlayFlag(false));
+      setLoginFailed(false);
+      signIn(loginForm.username, loginForm.password).then((isSuccessful) => {
+        setLoginFailed(!isSuccessful);
+        setOverlayFlag(false);
+      });
     }
+  };
+
+  const LoginFailedSnackBar = () => {
+    return (
+      <Snackbar
+        visible={loginFailed}
+        duration={3000}
+        onDismiss={() => setLoginFailed(false)}>
+        Login Failed! Please Try Again.
+      </Snackbar>
+    );
   };
 
   return (
@@ -94,7 +113,7 @@ const Login = () => {
             errorMessage={
               loginForm.passwordValid
                 ? null
-                : 'Please enter at least 8 characters'
+                : `Please enter at least ${MIN_PASSWORD_LENGTH} characters`
             }
             onSubmitEditing={login}
           />
@@ -120,6 +139,7 @@ const Login = () => {
             text="Please wait while we log you in..."
           />
         </View>
+        <LoginFailedSnackBar />
       </ScrollView>
     </TouchableWithoutFeedback>
   );
