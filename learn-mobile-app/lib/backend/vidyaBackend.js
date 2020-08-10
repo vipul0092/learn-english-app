@@ -50,6 +50,18 @@ export const verifyToken = async (token) => {
   return result;
 };
 
+export const revokeToken = async (token) => {
+  console.log('Revoking token: ' + token);
+  const deleteTokenUrl = `${VIDYA_BASE_URL}/auth/token/${token}`;
+  const request = new RequestBuilder({})
+    .url(deleteTokenUrl)
+    .auth(`api_key ${APP_API_KEY}`)
+    .delete()
+    .build();
+
+  await fetchDataWithOptions(request);
+};
+
 export const getStudentData = async (token) => {
   const getStudentUrl = `${VIDYA_BASE_URL}/students`;
   const request = new RequestBuilder({})

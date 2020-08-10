@@ -8,6 +8,7 @@ import {
   createToken,
   getStudentData,
   verifyToken,
+  revokeToken,
 } from '../backend/vidyaBackend';
 const UserContext = React.createContext();
 
@@ -22,6 +23,16 @@ const signIn = async (email, pass, setToken, setUserData) => {
     setUserData(userData);
   }
   return !!successful;
+};
+
+const signOut = async (token, setToken, setUserData) => {
+  // Revoking the token on log out
+  await revokeToken(token);
+  const successful = await saveUserInfo({});
+  if (successful) {
+    setToken('');
+    setUserData({});
+  }
 };
 
 export const useSetupUserData = () => {
@@ -52,14 +63,7 @@ export const useSetupUserData = () => {
       userName: userData.name,
       signIn: async (email, pass) =>
         await signIn(email, pass, setToken, setUserData),
-      signOut: async () => {
-        // TODO: We shoud be revoking the token on logging out
-        const successful = await saveUserInfo({});
-        if (successful) {
-          setToken('');
-          setUserData({});
-        }
-      },
+      signOut: async () => await signOut(token, setToken, setUserData),
     }),
     [token, userData],
   );
