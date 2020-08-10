@@ -50,6 +50,14 @@ public class AuthService {
         this.teacherService = teacherService;
     }
 
+    public Runnable getTokensCacheInvalidator() {
+        return tokensCache::invalidateAll;
+    }
+
+    public Runnable getApiKeysCacheInvalidator() {
+        return apiKeyCache::invalidateAll;
+    }
+
     /**
      * Generate token for the given request after verifying the information
      */
