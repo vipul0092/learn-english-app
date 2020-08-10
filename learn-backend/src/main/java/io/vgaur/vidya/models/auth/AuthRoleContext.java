@@ -1,5 +1,7 @@
 package io.vgaur.vidya.models.auth;
 
+import org.immutables.value.Value;
+
 import java.security.Principal;
 import java.util.Set;
 
@@ -9,5 +11,12 @@ import java.util.Set;
  */
 public interface AuthRoleContext extends Principal {
 
+    String ADMIN_ROLE = "ADMIN";
+
     Set<String> allowedRoles();
+
+    @Value.Derived
+    default boolean isAdmin() {
+        return allowedRoles().contains(ADMIN_ROLE);
+    }
 }
