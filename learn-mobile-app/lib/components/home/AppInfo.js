@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements';
 import { learnEnglish } from '../../assets/images';
 
 const AppInfo = () => {
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Image
         source={learnEnglish}
         style={{
@@ -19,7 +19,7 @@ const AppInfo = () => {
       <Text style={styles.bottomText}>Content by Rafaela</Text>
       <Text style={styles.bottomText}>Made by Vipul</Text>
       <Text style={styles.bottomText}>v1.0.0</Text>
-    </View>
+    </ScrollView>
   );
 };
 
