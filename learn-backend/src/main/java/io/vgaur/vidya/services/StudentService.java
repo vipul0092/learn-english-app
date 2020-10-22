@@ -1,12 +1,12 @@
 package io.vgaur.vidya.services;
 
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import io.vgaur.vidya.dao.StudentDao;
 import io.vgaur.vidya.models.ImmutableStudent;
 import io.vgaur.vidya.models.Student;
 import io.vgaur.vidya.models.StudentRequest;
+import io.vgaur.vidya.services.cache.CacheProvider;
+import io.vgaur.vidya.services.cache.GuavaCache;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.WebApplicationException;
@@ -21,20 +21,18 @@ import java.util.concurrent.ExecutionException;
 public class StudentService {
 
     private final StudentDao studentDao;
-    private final LoadingCache<String, Student> studentByEmailCache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<>() {
-                @Override
-                public Student load(String email) {
-                    return getStudentByEmailInternal(email);
-                }
-            });
-    private final LoadingCache<UUID, Student> studentByIdCache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<>() {
-                @Override
-                public Student load(UUID id) {
-                    return getStudentInternal(id);
-                }
-            });
+    private final CacheProvider<String, Student> studentByEmailCache = new GuavaCache<>(new CacheLoader<>() {
+        @Override
+        public Student load(String email) {
+            return getStudentByEmailInternal(email);
+        }
+    });
+    private final CacheProvider<UUID, Student> studentByIdCache = new GuavaCache<>(new CacheLoader<>() {
+        @Override
+        public Student load(UUID id) {
+            return getStudentInternal(id);
+        }
+    });
 
     public StudentService(StudentDao studentDao) {
         this.studentDao = studentDao;
@@ -42,8 +40,8 @@ public class StudentService {
 
     public Runnable getStudentCachesInvalidator() {
         return () -> {
-            studentByEmailCache.invalidateAll();
-            studentByIdCache.invalidateAll();
+            studentByEmailCache.removeAll();
+            studentByIdCache.removeAll();
         };
     }
 
@@ -67,14 +65,14 @@ public class StudentService {
      * Get student for the given student id
      */
     public Student getStudent(UUID studentId) throws ExecutionException {
-        return studentByIdCache.get(studentId);
+        return studentByIdCache.get(studentId).get();
     }
 
     /**
      * Get student with the given email address
      */
     public Student getStudentByEmail(String email) throws ExecutionException {
-        return studentByEmailCache.get(email);
+        return studentByEmailCache.get(email).get();
     }
 
     private Student getStudentInternal(UUID studentId) {
@@ -89,7 +87,7 @@ public class StudentService {
     }
 
     private void addStudentToCaches(Student student) {
-        studentByIdCache.put(student.id(), student);
-        studentByEmailCache.put(student.email().toLowerCase(), student);
+        studentByIdCache.set(student.id(), student);
+        studentByEmailCache.set(student.email().toLowerCase(), student);
     }
 }

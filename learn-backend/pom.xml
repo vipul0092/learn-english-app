@@ -24,6 +24,7 @@
         <mybatis.version>3.5.4</mybatis.version>
         <mybatis-typehandlers-jsr310.version>1.0.2</mybatis-typehandlers-jsr310.version>
         <postgresql.version>42.2.12</postgresql.version>
+        <dropwizard-redis>1.5.1</dropwizard-redis>
         <mainClass>io.vgaur.vidya.VidyaServiceApplication</mainClass>
     </properties>
 
@@ -103,11 +104,21 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-migrations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.modules</groupId>
+            <artifactId>dropwizard-redis</artifactId>
+            <version>${dropwizard-redis}</version>
+        </dependency>
 
 
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
