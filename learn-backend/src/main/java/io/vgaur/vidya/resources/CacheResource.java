@@ -1,6 +1,5 @@
 package io.vgaur.vidya.resources;
 
-import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.auth.Auth;
 import io.vgaur.vidya.models.auth.ApiKeyContext;
@@ -50,7 +49,6 @@ public class CacheResource {
 
     public enum CacheType {
         ALL,
-        TOKENS,
         APIKEYS,
         STUDENTS,
         TEACHERS

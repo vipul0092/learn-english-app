@@ -1,10 +1,10 @@
 package io.vgaur.vidya.services;
 
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import io.vgaur.vidya.dao.TeacherDao;
 import io.vgaur.vidya.models.Teacher;
+import io.vgaur.vidya.services.cache.CacheProvider;
+import io.vgaur.vidya.services.cache.GuavaCache;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.WebApplicationException;
@@ -18,20 +18,19 @@ import java.util.concurrent.ExecutionException;
 public class TeacherService {
 
     private final TeacherDao teacherDao;
-    private final LoadingCache<UUID, Teacher> teacherCache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<>() {
-                @Override
-                public Teacher load(UUID teacherId) {
-                    return getTeacherInternal(teacherId);
-                }
-            });
+    private final CacheProvider<UUID, Teacher> teacherCache = new GuavaCache<>(new CacheLoader<>() {
+        @Override
+        public Teacher load(UUID teacherId) {
+            return getTeacherInternal(teacherId);
+        }
+    });
 
     public TeacherService(TeacherDao teacherDao) {
         this.teacherDao = teacherDao;
     }
 
     public Runnable getTeachersCacheInvalidator() {
-        return teacherCache::invalidateAll;
+        return teacherCache::removeAll;
     }
 
     /**
@@ -39,7 +38,7 @@ public class TeacherService {
      */
     public Teacher createTeacher(Teacher teacher) {
         teacherDao.addTeacher(teacher);
-        teacherCache.put(teacher.id(), teacher);
+        teacherCache.set(teacher.id(), teacher);
         return teacher;
     }
 
@@ -47,7 +46,7 @@ public class TeacherService {
      * Get teacher for the given id
      */
     public Teacher getTeacher(UUID teacherId) throws ExecutionException {
-        return teacherCache.get(teacherId);
+        return teacherCache.get(teacherId).get();
     }
 
     private Teacher getTeacherInternal(UUID teacherId) {

@@ -12,6 +12,24 @@ server:
         archivedLogFilenamePattern: "logs/access.%d{yyyy-MM-dd}.log.gz"
   type: "default"
 
+redis:
+  type: basic
+  name: vidya-backend-temp-storage
+  node:
+    type: redis
+    node: "vidya.cctfbu.0001.use1.cache.amazonaws.com:6379"
+    clientName: vidya-backend
+  redisCodec:
+    type: string
+  clientResources:
+    type: default
+    commandLatencyCollector:
+      type: default
+      enabled: false
+
+# TTL of one week
+tokenTTL: 604800
+
 database:
   driverClass: org.postgresql.Driver
   maxWaitForConnection: 1s

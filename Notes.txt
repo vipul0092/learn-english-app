@@ -63,6 +63,7 @@ sed -i -e 's/DB_PASSWORD/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/sr
 sed -i -e 's/DB_URL/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
 sed -i -e 's/S3_KEY/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
 sed -i -e 's/S3_SECRET/ACTUAL_VALUE/g' code/learn-english-app/learn-backend/src/configs/config.yml
+sed -i -e 's/USE_DISTRIBUTED_CACHE \= false/USE_DISTRIBUTED_CACHE \= true/g' code/learn-english-app/learn-backend/src/main/java/io/vgaur/vidya/VidyaServiceApplication.java
 
 ## Installing the Java service as a systemd process
 sudo chmod 744 permissions.sh
