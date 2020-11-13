@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from 'react';
+import React, { useState, useRef, forwardRef, useCallback } from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -24,6 +24,17 @@ const defaultState = {
   isLoading: false,
 };
 
+const LoginFailedSnackBar = ({ loginFailed, setLoginFailed }) => {
+  return (
+    <Snackbar
+      visible={loginFailed}
+      duration={3000}
+      onDismiss={() => setLoginFailed(false)}>
+      Login Failed! Please Try Again.
+    </Snackbar>
+  );
+};
+
 const Login = () => {
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
@@ -33,29 +44,32 @@ const Login = () => {
   const [showOverlay, setOverlayFlag] = useState(false);
   const [loginFailed, setLoginFailed] = useState(false);
 
-  const setState = (field, value) =>
-    setLoginFormState((currentState) => ({
-      ...currentState,
-      [field]: value,
-    }));
+  const setState = useCallback(
+    (field, value) =>
+      setLoginFormState((currentState) => ({
+        ...currentState,
+        [field]: value,
+      })),
+    [setLoginFormState],
+  );
 
-  const validateUsername = () => {
+  const validateUsername = useCallback(() => {
     const { username } = loginForm;
     const usernameValid = username.length > 0;
     setState('usernameValid', usernameValid);
     usernameValid || usernameInput.current.shake();
     return usernameValid;
-  };
+  }, [loginForm, setState]);
 
-  const validatePassword = () => {
+  const validatePassword = useCallback(() => {
     const { password } = loginForm;
     const passwordValid = password.length >= MIN_PASSWORD_LENGTH;
     setState('passwordValid', passwordValid);
     passwordValid || passwordInput.current.shake();
     return passwordValid;
-  };
+  }, [loginForm, setState]);
 
-  const login = () => {
+  const login = useCallback(() => {
     const isUserNameValid = validateUsername();
     const isPasswordValid = validatePassword();
     if (isUserNameValid && isPasswordValid) {
@@ -66,18 +80,14 @@ const Login = () => {
         setOverlayFlag(false);
       });
     }
-  };
-
-  const LoginFailedSnackBar = () => {
-    return (
-      <Snackbar
-        visible={loginFailed}
-        duration={3000}
-        onDismiss={() => setLoginFailed(false)}>
-        Login Failed! Please Try Again.
-      </Snackbar>
-    );
-  };
+  }, [
+    loginForm,
+    setOverlayFlag,
+    setLoginFailed,
+    signIn,
+    validatePassword,
+    validateUsername,
+  ]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -139,7 +149,10 @@ const Login = () => {
             text="Please wait while we log you in..."
           />
         </View>
-        <LoginFailedSnackBar />
+        <LoginFailedSnackBar
+          loginFailed={loginFailed}
+          setLoginFailed={setLoginFailed}
+        />
       </ScrollView>
     </TouchableWithoutFeedback>
   );

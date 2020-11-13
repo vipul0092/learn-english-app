@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Button, Text, Divider } from 'react-native-elements';
 import { QUESTION_DESCRIPTIONS } from './questionTypes';
 import { AnswerStatus } from './AnswerStatus';
+
+const centerAlign = {
+  justifyContent: 'center',
+  alignItems: 'center',
+};
 
 /**
  * Basic question layout component for all questions
@@ -16,9 +21,9 @@ export const QuestionLayout = ({
   showStatus,
 }) => {
   const [sucess, setSuccess] = useState(false);
-  const verify = () => {
+  const verify = useCallback(() => {
     setSuccess(verifyAnswer());
-  };
+  }, [verifyAnswer]);
   return (
     <ScrollView>
       <View style={{ marginTop: 15, marginBottom: 15 }}>
@@ -33,11 +38,7 @@ export const QuestionLayout = ({
       </View>
       <View>{children}</View>
       <Divider style={{ height: 1, marginTop: 20 }} />
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+      <View style={centerAlign}>
         <Button buttonStyle={styles.button} title="CHECK" onPress={verify} />
         {showStatus && <AnswerStatus success={sucess} />}
       </View>

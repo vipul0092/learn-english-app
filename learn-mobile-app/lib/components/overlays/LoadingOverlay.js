@@ -3,17 +3,12 @@ import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { Overlay } from 'react-native-elements';
 
 const LoadingOverlay = ({ isVisible, text }) => {
-  const Content = () => {
-    return (
+  return (
+    <Overlay isVisible={isVisible} width="auto" height="auto">
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#00ff00" />
         <Text style={styles.text}>{text}</Text>
       </View>
-    );
-  };
-  return (
-    <Overlay isVisible={isVisible} width="auto" height="auto">
-      <Content />
     </Overlay>
   );
 };

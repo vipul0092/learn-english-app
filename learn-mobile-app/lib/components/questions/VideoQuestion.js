@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Video from 'react-native-video';
@@ -29,27 +29,36 @@ const VideoQuestion = ({ text, videoSource }) => {
     [setState],
   );
 
-  const onLoad = (data) => {
-    setProperty({ duration: data.duration });
-  };
+  const onLoad = useCallback(
+    (data) => {
+      setProperty({ duration: data.duration });
+    },
+    [setProperty],
+  );
 
-  const onProgress = (data) => {
-    setProperty({ currentTime: data.currentTime });
-  };
+  const onProgress = useCallback(
+    (data) => {
+      setProperty({ currentTime: data.currentTime });
+    },
+    [setProperty],
+  );
 
-  const onEnd = () => {
+  const onEnd = useCallback(() => {
     video.current.seek(0);
     setProperty({ currentTime: 0 });
     setPaused(true);
-  };
+  }, [setProperty, setPaused]);
 
-  const onAudioBecomingNoisy = () => {
+  const onAudioBecomingNoisy = useCallback(() => {
     setPaused(true);
-  };
+  }, [setPaused]);
 
-  const onAudioFocusChanged = (event) => {
-    setPaused(!event.hasAudioFocus);
-  };
+  const onAudioFocusChanged = useCallback(
+    (event) => {
+      setPaused(!event.hasAudioFocus);
+    },
+    [setPaused],
+  );
 
   const getCurrentTimePercentage = useCallback(() => {
     if (state.currentTime > 0) {
@@ -67,8 +76,13 @@ const VideoQuestion = ({ text, videoSource }) => {
     return `${minutes}:${padZero(seconds)}`;
   }, []);
 
-  const flexCompleted = getCurrentTimePercentage() * 100;
-  const flexRemaining = (1 - getCurrentTimePercentage()) * 100;
+  const currentTimePercentage = getCurrentTimePercentage();
+  const flexCompleted = useMemo(() => currentTimePercentage * 100, [
+    currentTimePercentage,
+  ]);
+  const flexRemaining = useMemo(() => (1 - currentTimePercentage) * 100, [
+    currentTimePercentage,
+  ]);
 
   return (
     <QuestionLayout

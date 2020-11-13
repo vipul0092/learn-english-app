@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useUserContext } from '../../../context/UserContext';
 import LoadingOverlay from '../../overlays/LoadingOverlay';
@@ -6,10 +6,10 @@ import LoadingOverlay from '../../overlays/LoadingOverlay';
 const Expert = () => {
   const { userName, signOut } = useUserContext();
   const [showOverlay, setOverlayFlag] = useState(false);
-  const logOut = () => {
+  const logOut = useCallback(() => {
     setOverlayFlag(true);
     signOut().then(() => setOverlayFlag(false));
-  };
+  }, [signOut]);
   return (
     <View style={styles.container}>
       <Text>{`Hi ${userName}!, you are in the expert section`}</Text>

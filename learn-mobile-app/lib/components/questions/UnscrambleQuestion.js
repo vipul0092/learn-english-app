@@ -16,17 +16,52 @@ const ANSWER = 'This is an app';
 
 const QUESTION_TEXT = 'What would you call what you are using right now?';
 
+const WordText = ({ show, text }) => (
+  <Text style={show ? styles.text : styles.disabledText}>{text}</Text>
+);
+
 const TouchableText = ({ word, onPress, showOverride = false }) => {
   const show = word.show || showOverride;
-  const WordText = () => (
-    <Text style={show ? styles.text : styles.disabledText}>{word.text}</Text>
-  );
+
   return show ? (
     <TouchableScale onPress={() => onPress(word.text)}>
-      <WordText />
+      <WordText show={show} text={word.text} />
     </TouchableScale>
   ) : (
-    <WordText />
+    <WordText show={show} text={word.text} />
+  );
+};
+
+const Top = ({ top, hideTopShowBottom }) => {
+  return (
+    <View style={styles.centered}>
+      {Object.values(top).map((word) => (
+        <View key={word.text} style={styles.topWord}>
+          <TouchableText word={word} onPress={hideTopShowBottom} />
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const Bottom = ({ bottom, hideBottomShowTop }) => {
+  return (
+    <View style={styles.centered}>
+      {bottom.map((word) => (
+        <View key={word.text} style={styles.topWord}>
+          <TouchableText showOverride word={word} onPress={hideBottomShowTop} />
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const Answer = ({ bottom, hideBottomShowTop }) => {
+  return (
+    <View>
+      <Text style={styles.bottomAnswer}>Answer:</Text>
+      <Bottom bottom={bottom} hideBottomShowTop={hideBottomShowTop} />
+    </View>
   );
 };
 
@@ -41,14 +76,14 @@ const UnscrambleQuestion = () => {
   const [bottom, setBottom] = useState([]);
   const [showStatus, setShowStatus] = useState(false);
 
-  const verifyAnswer = () => {
+  const verifyAnswer = useCallback(() => {
     let answer = '';
     bottom.forEach((word, index) => {
       answer = answer + word.text + (index === bottom.length - 1 ? '' : ' ');
     });
     setShowStatus(true);
     return answer === ANSWER;
-  };
+  }, [bottom]);
 
   const hideTopShowBottom = useCallback(
     (text) => {
@@ -81,43 +116,6 @@ const UnscrambleQuestion = () => {
     [setTop, setBottom, top],
   );
 
-  const Top = () => {
-    return (
-      <View style={styles.centered}>
-        {Object.values(top).map((word) => (
-          <View key={word.text} style={styles.topWord}>
-            <TouchableText word={word} onPress={hideTopShowBottom} />
-          </View>
-        ))}
-      </View>
-    );
-  };
-
-  const Bottom = () => {
-    return (
-      <View style={styles.centered}>
-        {bottom.map((word) => (
-          <View key={word.text} style={styles.topWord}>
-            <TouchableText
-              showOverride
-              word={word}
-              onPress={hideBottomShowTop}
-            />
-          </View>
-        ))}
-      </View>
-    );
-  };
-
-  const Answer = () => {
-    return (
-      <View>
-        <Text style={styles.bottomAnswer}>Answer:</Text>
-        <Bottom />
-      </View>
-    );
-  };
-
   return (
     <QuestionLayout
       questionType={QUESTION_TYPES.UNSCRAMBLE}
@@ -125,8 +123,8 @@ const UnscrambleQuestion = () => {
       verifyAnswer={verifyAnswer}
       showStatus={showStatus}>
       <View style={{ flexDirection: 'column', marginBottom: 15 }}>
-        <Top />
-        <Answer />
+        <Top top={top} hideTopShowBottom={hideTopShowBottom} />
+        <Answer bottom={bottom} hideBottomShowTop={hideBottomShowTop} />
       </View>
     </QuestionLayout>
   );
