@@ -122,7 +122,7 @@ const UnscrambleQuestion = () => {
       questionText={QUESTION_TEXT}
       verifyAnswer={verifyAnswer}
       showStatus={showStatus}>
-      <View style={{ flexDirection: 'column', marginBottom: 15 }}>
+      <View style={styles.parentView}>
         <Top top={top} hideTopShowBottom={hideTopShowBottom} />
         <Answer bottom={bottom} hideBottomShowTop={hideBottomShowTop} />
       </View>
@@ -143,6 +143,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  parentView: {
+    flexDirection: 'column',
+    marginBottom: 15,
   },
   topWord: {
     marginLeft: 5,
