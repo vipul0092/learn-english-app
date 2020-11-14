@@ -1,23 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { useUserContext } from '../../../context/UserContext';
-import LoadingOverlay from '../../overlays/LoadingOverlay';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { SingleChoiceQuestion } from '../../questions/SingleChoiceQuestion';
 
 const Expert = () => {
-  const { userName, signOut } = useUserContext();
-  const [showOverlay, setOverlayFlag] = useState(false);
-  const logOut = useCallback(() => {
-    setOverlayFlag(true);
-    signOut().then(() => setOverlayFlag(false));
-  }, [signOut]);
   return (
     <View style={styles.container}>
-      <Text>{`Hi ${userName}!, you are in the expert section`}</Text>
-      <Button title="Log Out" onPress={logOut} />
-      <LoadingOverlay
-        isVisible={showOverlay}
-        text="Logging you out, come back soon!"
-      />
+      <SingleChoiceQuestion />
     </View>
   );
 };
