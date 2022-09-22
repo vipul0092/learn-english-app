@@ -23,7 +23,7 @@
         <guava.version>29.0-jre</guava.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mybatis-typehandlers-jsr310.version>1.0.2</mybatis-typehandlers-jsr310.version>
-        <postgresql.version>42.3.3</postgresql.version>
+        <postgresql.version>42.3.7</postgresql.version>
         <dropwizard-redis>1.5.1</dropwizard-redis>
         <mainClass>io.vgaur.vidya.VidyaServiceApplication</mainClass>
     </properties>
